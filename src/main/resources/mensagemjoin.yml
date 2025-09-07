@@ -1,0 +1,94 @@
+###################################################################################
+#                                                                                 #
+#                    🔥 PLUGIN DESENVOLVIDO POR CEEST_ 🔥
+#                    🔥 CRIE QUANTOS GRUPOS QUISER     🔥
+#                    🔥 CRIE QUANTAS MENSAGENS QUISER  🔥
+#                                                                                 #
+###################################################################################
+
+# CHEQUE SE NÃO HÁ PLUGINS QUE DESATIVEM A MENSAGEM DE JOIN
+
+# discord para suporte: cestou
+
+# /cr para recarregar as configurações
+
+settings:
+  modoautomatico: false  # quando um jogador sem grupo entrar ele setará automaticamente o grupo aqui
+  desativarsaida: true  # ative ou desative mensagens de saída
+
+######################################
+#                                    #
+#         💬 GRUPOS ENTRADA
+#                                    #
+######################################
+
+groups:
+  admin: # Altere o Grupo como está no LuckPerms
+    messages:
+      - ""
+      - ""
+      - "&cFUJAM &c&lADM $player! &cchegouuu!!!"
+      - ""
+      - ""
+  default:
+    messages:
+      - ""
+      - "&7O jogador &c$player! &9entrou no jogo"
+      - ""
+  exemplo:
+    messages:
+      - ""
+      - "&7$player! entrou"
+      - "isso é um exemplo!"
+      - ""
+      - "Nos vemos por aí!"
+
+######################################
+#                                    #
+#          💬 GRUPOS SAÍDA
+#                                    #
+######################################
+
+gruposaida: # Caso faça alterações utilize /cr
+  exemplo1:
+    mensagemsaida:
+      - ""
+      - "&c&lO CHEFE $player SAIU!!!"
+      - ""
+  exemplo2:
+    mensagemsaida:
+      - ""
+      - "O mod $player saiu do servidor!"
+      - ""
+
+############################################################
+#                                                          #
+#                  🔴 MÓDULO PERMISSÕES
+#                                                          #
+############################################################
+
+permissao:
+  cjoin:  # ⚠️ NÃO ALTERE, chave primária da permissão ⚠️
+    admin:
+      messages: # a permissão ficará assim: cjoin.admin
+        - ""
+        - "&cFUJAM &c&lADM $player! &cchegouuu!!!"
+        - ""
+    vip:  # Subsessão, crie quantas quiser
+      messages:
+        - ""
+        - "&bO jogador &l$player! &bentrou no jogo"
+        - ""
+
+permissisaosaida:
+  cquit:  # ⚠️ NÃO ALTERE, chave primária da permissão ⚠️
+    mod:
+      messages: # a permissão ficará assim: cquit.mod
+        - ""
+        - "&cgraças &c&l $player! &cfoi tomar banho!!!"
+        - ""
+    mvp:
+      messages:
+        - ""
+        - "&bO Imponente &l$player! &binfelizmente saiu do jogo"
+        - ""

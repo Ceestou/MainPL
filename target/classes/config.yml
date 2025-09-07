@@ -1,0 +1,357 @@
+##############################################################
+#                                                            #
+#                         CONQUISTAS                         #
+#                                                            #
+##############################################################
+
+desabilitar-conquistas: false
+rep:
+  max-daily: 3
+receitas_antigas: true
+
+
+##############################################################
+#                                                            #
+#                    ULTRA ENCANTAMENTOS                     #
+#                                                            #
+##############################################################
+
+formulas:
+  sharpness:
+    extra-per-level: 1.5     # dano extra por nível acima do 5
+  protection:
+    extra-percent-per-level: 0.04    # redução adicional por nível acima do 4 (0.04 = 4%)
+    piece-cap: 0.40      # máx 40% por peça
+    total-cap: 0.90      # máx 90% no total
+  knockback:
+    extra-per-level: 0.2 # multiplicador de velocidade adicional por nível acima do 2
+  power:
+    extra-per-level: 0.5 # dano extra por nível acima do 5
+
+max-level: 1000 # level max do encantamento
+
+enchant:
+  grupos:
+    - admin
+
+# OBS: O ENCHANT DA EFICIÊNCIA NÃO IRÁ FUNCIONAR ATÉ MAIS QUE O 5.
+
+##############################################################
+#                                                            #
+#                      BAUS VIRTUAIS                         #
+#                                                            #
+##############################################################
+
+baumanager: # grupos que podem ter e delay para abrir
+  apoiador:
+    delay: 2
+    cooldown: 2
+  streamer:
+    delay: 3
+    cooldown: 4
+
+sbau:
+  apoiador: true
+  vip: true
+  elite: true
+  default: false
+
+##############################################################
+#                                                            #
+#                      COMANDOS EXTRAS                       #
+#                                                            #
+##############################################################
+
+comandos:
+  anvil:
+    apoiador:
+      delay_seconds: 0
+      cooldown_seconds: 5
+  luz:
+    apoiador:
+      delay_seconds: 0
+      cooldown_seconds: 5
+
+  craft:
+    apoiador:
+      delay_seconds: 2
+      cooldown_seconds: 10
+    influencer:
+      delay_seconds: 2
+      cooldown_seconds: 10
+
+  lixo:
+    apoiador:
+      delay_seconds: 2
+      cooldown_seconds: 10
+    influencer:
+      delay_seconds: 2
+      cooldown_seconds: 10
+
+  fornalha:
+    apoiador:
+      delay_seconds: 2
+      cooldown_seconds: 10
+    influencer:
+      delay_seconds: 2
+      cooldown_seconds: 10
+
+  hat:
+    apoiador:
+      delay_seconds: 2
+      cooldown_seconds: 10
+    influencer:
+      delay_seconds: 2
+      cooldown_seconds: 10
+
+  invsee:
+    apoiador:
+      delay_seconds: 2
+      cooldown_seconds: 10
+    influencer:
+      delay_seconds: 2
+      cooldown_seconds: 10
+
+##############################################################
+#                                                            #
+#                      COMANDOS UTILS                        #
+#                                                            #
+##############################################################
+
+utils:
+  feed:
+    - admin
+    - moderador
+  heal:
+    - admin
+    - moderador
+  gm:
+    - admin
+  tphere:
+    - admin
+  fly:
+    - admin
+    - vip
+  speed:
+    - admin
+    - vip
+  clearchat:
+    - admin
+  god:
+    - admin
+  afk:
+    - admin
+    - vip
+    - moderador
+  jail:
+    - admin
+    - moderador
+  freeze:
+    - admin
+  ban:
+    - admin
+    - moderador
+  unban:
+    - admin
+    - moderador
+  tempban:
+    - admin
+    - moderador
+  tempbanip:
+    - admin
+    - moderador
+  skull:
+    - admin
+  enchant:
+    - admin
+  give:
+    - admin
+  giveall:
+    - admin
+  exp:
+    - admin
+  level:
+    - admin
+  up:
+    - admin
+  rename:
+    - admin
+  kickall:
+    - admin
+  lightning:
+    - admin
+  lightningall:
+    - admin
+  list:
+    - admin
+  repair:
+    - admin
+  repairall:
+    - admin
+  top:
+    - admin
+
+##############################################################
+#                                                            #
+#                          MORTES                            #
+#                                                            #
+##############################################################
+
+mortes:
+  back:
+    apoiador:
+      back_delay_seconds: 4 # comando /back delay
+      back_cooldown_seconds: 20 # para usar denovo
+      limit_mortes_list: 5 # máximo de lista de mortes
+    influencer:
+      back_delay_seconds: 1
+      back_cooldown_seconds: 10
+      limit_mortes_list: 3 # pode usar por exemplo /back 3
+
+
+##############################################################
+#                                                            #
+#                      ADMIN COMMANDS                        #
+#                                                            #
+##############################################################
+
+spawn:
+  setspawn:
+    - admin
+    - apoiador
+  delays:
+    default_delay: 5s
+    apoiador: 1s
+  cooldowns:
+    default_cooldown: 10s
+    apoiador: 1s
+  join-spawn: false   # envia para o spawn ao entrar no servidor
+  death-spawn: false  # envia para o spawn ao morrer
+
+gemas:
+  dargemas:
+    quantia: 11              # Quantas gemas o jogador recebe ao usar /dargemas
+    permissao-op: true       # Somente OP pode usar /dargemas
+  anunciar:
+    custo: 7                 # Quantas gemas custa anunciar
+    cooldown: 60             # Tempo em segundos entre anúncios
+
+warps:
+  setwarps:
+    - admin
+  delwarps:
+    - admin
+  cmdwarps:
+    - admin
+  warpEspecial:
+    vipWarp:
+      - vip
+    apoiadorWarp:
+      - apoiador
+  delays:
+    default_delay: 5s
+    apoiador: 10s
+    vip: 2m
+    elite: 1h
+  cooldowns:
+    default_cooldown: 10s
+    apoiador: 20s
+    vip: 30s
+    elite: 1d
+
+##############################################################
+#                                                            #
+#                      AUTO-BROADCAST                        #
+#                                                            #
+##############################################################
+
+automensagens:
+  intervalo: 5m
+  mensagens:
+    1:
+      Titulo: false
+      ActionBar: false
+      Subtitle: false
+      chat: true
+      linhas:
+        - "§aNOVAMINE"
+        - "§eBEM-VINDO"
+    2:
+      Titulo: false
+      ActionBar: false
+      Subtitle: false
+      chat: true
+      linhas:
+          - "§cConfira nossa loja!"
+          - "§bUse /loja para acessar"
+    3:
+      Titulo: false
+      ActionBar: false
+      Subtitle: false
+      chat: true
+      linhas:
+          - "§6Terra Sangrenta"
+          - "&fo sangue irá correr"
+          - "esconda-se"
+
+##############################################################
+#                                                            #
+#                      COMANDOS VIP                          #
+#                                                            #
+##############################################################
+
+setmsgjoin: # Os grupos daqui poderão setar mensagem de join personalizada
+  - apoiador
+  - vip
+  - moderador
+
+nick: # Os grupos daqui poderão alterar o nick (Displayname)
+  grupos:
+    - apoiador
+    - vip
+    - staff
+
+
+rtp:
+  cooldown: # para usar o rtp novamente
+    apoiador: 10m
+    dono: 0s
+    default: 30m
+  delay: # para se teleportar ao usar o rtp
+    apoiador: 2s
+    dono: 0s
+    default: 5s
+
+##############################################################
+#                                                            #
+#                        ADICIONAIS                          #
+#                                                            #
+##############################################################
+
+maxhomes:
+  apoiador: 15
+  vip: 10
+  default: 4
+
+
+tempotpa:
+  apoiador: 0s
+  vip: 10s
+  default: 5s
+
+##############################################################
+#                                                            #
+#                      RANKING KILLS                         #
+#                                                            #
+##############################################################
+
+delay_kill: 30s # Delay pra contabilizar o mesmo player como Kill
+
+TOP_LIMIT: 3 # O máximo que terá tag personalizada, que aparecerá quando ultrapassar e etc...
+
+topaviso:
+  titulo: true        # Mostra a mensagem de subida como título
+  subtitulo: true     # Mostra a mensagem de subida como subtítulo
+  chat: true          # Mostra a mensagem de subida no chat
+  actionbar: true     # Mostra a mensagem de subida na actionbar
+

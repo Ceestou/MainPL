@@ -1,0 +1,45 @@
+# Use a CHAVE OFICIAL como seção e liste aliases.
+# Exemplos úteis (adicione os seus!):
+
+sharpness:
+  - af
+  - afi
+  - sharp
+  - corte
+
+fire_aspect:
+  - aspc
+  - fogo
+  - fire
+
+knockback:
+  - kb
+  - empuxo
+
+protection:
+  - prot
+  - protec
+
+projectile_protection:
+  - proj
+  - projprot
+
+fire_protection:
+  - fprot
+  - protfogo
+
+blast_protection:
+  - bprot
+  - protboom
+
+power:
+  - pow
+  - forca
+
+punch:
+  - punch
+  - impacto
+
+flame:
+  - chama
+  - flame

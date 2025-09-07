@@ -1,0 +1,14 @@
+name: MainPL
+version: '1.0-SNAPSHOT'
+main: org.com.mainpl.MainPL
+authors: [ ceest_ ]
+api-version: "1.13"
+
+commands:
+  decentreload:
+    description: Recarrega a configuração do plugin
+    usage: /cp
+    aliases: [reloaddecent, dr, dreload, decent, cPremiumJoinReload,cr,recarregar]
+    permission: decentplugins.reload
+    permission-message: "Você não tem permissão para usar este comando!"
+

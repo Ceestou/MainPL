@@ -15,9 +15,92 @@
 ### 🛠️ Comandos Utilitários
 - `/level [jogador]` → Gerencia níveis de jogadores (**adicionar**, **remover** ou **ver**).  
 - `/fly [jogador]` → Ativa/desativa o voo para si ou para outro jogador.  
-- `/spawn` → Leva jogadores diretamente ao spawn configurado.  
-- `/kick [jogador]` → Expulsa jogadores, uso via console ou em game.
+- `/spawn` → Leva jogadores diretamente ao spawn configurado.
+- `/craft` → Abre a **crafting table** diretamente na mão do jogador. 🛠️  
+- `/lixo` → Abre um inventário temporário para descartar itens. 🗑️  
+- `/fornalha` → Abre uma **fornalha** para o jogador. 🔥  
+- `/hat` → Coloca o item na mão como **chapéu**. 👒  
+- `/invsee [jogador]` → Permite **visualizar o inventário** de outro jogador. 👀  
+- `/luz` → Liga/desliga **visão noturna**. 🌙  
+- `/anvil` → Abre uma **bigorna** para reparos e encantamentos. ⚒️   
+---
 
+#### 🔹 Comandos de Jogabilidade e Inventário
+- `/speed [jogador]` → Ajusta velocidade de movimento.  
+- `/feed [jogador]` → Restaura fome do jogador.  
+- `/heal [jogador]` → Cura o jogador.  
+- `/hat` → Coloca o item da mão como capacete.  
+- `/lixo` → Abre inventário de descarte de itens.  
+- `/craft` → Abre a bancada de crafting.  
+- `/fornalha` → Abre uma fornalha.  
+- `/luz` → Ativa/desativa visão noturna.  
+- `/rename [item]` → Renomeia item na mão.
+---
+
+### 👑 Comandos Administrativos
+- `/gm [modo]` → Muda o modo de jogo do jogador (`/gm2` para Criativo).  
+- `/invsee [jogador]` → Abre o inventário de outro jogador. 
+- `/god` → Ativa modo Deus.  
+- `/ban [jogador]` → Bane jogador permanentemente.  
+- `/unban [jogador]` → Remove banimento.  
+- `/tempban [jogador]` → Bane temporariamente.  
+- `/tempbanip [IP]` → Bane temporariamente pelo IP.  
+- `/list` → Lista jogadores online.  
+- `/clearchat` → Limpa o chat.  
+- `/repair [item]` → Repara item na mão.  
+- `/repairall` → Repara todos os itens do inventário.  
+- `/lightning [jogador]` → Lança raio sobre jogador.  
+- `/lightningall` → Lança raio em todos os jogadores.
+- `/kick [jogador]` → Expulsa jogador (console ou in-game).  
+- `/kickall` → Expulsa todos os jogadores online.
+- `/receitas` → Abre menu de receitas de crafting.
+- `/receitas create` → Permite criar receitas facilmente.   
+- `/give [jogador] [item] [Encantamento]` → Dá item a um jogador já encantado se quiser.  
+- `/giveall [item] [Encantamento]` → Dá item a todos os jogadores.  
+- `/enchant [item] [encantamento] [nível]` → Aplica encantamento a item até o máximo 1000 ou quanto desejar.
+- `/mortes` → Mostra mortes do jogador.  
+- `/back [quantia]` → Permite voltar a locais de morte antigos.  
+---
+
+#### ✨ Comandos de Mensagens e Interação
+- `/anunciar [mensagem]` → Envia mensagem global para todos.  
+- `/setjoinmsg [mensagem]` → Define mensagem de entrada personalizada.  
+- `/confiar [jogador]` → Dá permissão para acessar baú ou área.  
+- `/acessar [jogador]` → Acessa baú de outro jogador autorizado.  
+- `/rep [jogador]` → Dá reputação a um jogador.  
+- `/repinfo [jogador]` → Mostra informações de reputação.
+---
+
+#### 🧶 Comandos de Personalização
+- `/nick [novoNome]` → Altera o apelido do jogador.  
+- `/restaurarnick` → Remove apelido e retorna ao nome original.  
+- `/especial` → Acessa menu especial de comandos.  
+- `/sbau` → Acessa baú especial.  
+- `/escolher` → Seleciona opções de baús.
+---
+
+#### 🛑 Comandos de Configuração e Suporte
+- `/mreload` → Recarrega configuração do plugin.  
+- `/ajuda` → Mostra todos os comandos disponíveis totalmente editável.  
+- `/auth` → Sistema de autenticação interno.  
+- `/migrar` → Migra dados das homes do Essentials para o plugin.  
+- `/migrarwarp` → Migra warps do Essentials para o plugin.
+---
+
+#### ⌛ Comandos de Teleporte e Localização
+- `/spawn` → Teleporta ao spawn principal.  
+- `/setspawn` → Define o spawn principal.  
+- `/sethome [nome]` → Define uma home.  
+- `/home [nome]` → Teleporta para a home.  
+- `/homes` → Lista todas as homes do jogador.  
+- `/delhome [nome]` → Remove uma home.  
+- `/warp [nome]` → Teleporta para warp.  
+- `/setwarp [nome]` → Cria warp.  
+- `/delwarp [nome]` → Remove warp.  
+- `/warps` → Lista todos os warps disponíveis em GUI totalmente configurável.  
+- `/tpa [jogador]` → Solicita teleporte para outro jogador.  
+- `/tpahere [jogador]` → Solicita teleporte de outro jogador para você.   
+- `/tphere [jogador]` → Teleporta o jogador até você.  
 ---
 
 ### 🎁 Sistema de Apoio

@@ -19,7 +19,6 @@
 - `/craft` → Abre a **crafting table** diretamente na mão do jogador. 🛠️  
 - `/lixo` → Abre um inventário temporário para descartar itens. 🗑️  
 - `/fornalha` → Abre uma **fornalha** para o jogador. 🔥  
-- `/hat` → Coloca o item na mão como **chapéu**. 👒  
 - `/invsee [jogador]` → Permite **visualizar o inventário** de outro jogador. 👀  
 - `/luz` → Liga/desliga **visão noturna**. 🌙  
 - `/anvil` → Abre uma **bigorna** para reparos e encantamentos. ⚒️   
@@ -31,9 +30,6 @@
 - `/heal [jogador]` → Cura o jogador.  
 - `/hat` → Coloca o item da mão como capacete.  
 - `/lixo` → Abre inventário de descarte de itens.  
-- `/craft` → Abre a bancada de crafting.  
-- `/fornalha` → Abre uma fornalha.  
-- `/luz` → Ativa/desativa visão noturna.  
 - `/rename [item]` → Renomeia item na mão.
 ---
 

@@ -708,12 +708,12 @@ public class MainPL extends JavaPlugin {
 
                     getLogger().warning(updateArt);
                     getLogger().warning(">> Nova versão disponível: " + remoteVersionFinal + " (local: " + localVersion + ")");
-                    getLogger().warning(">> Baixe em: https://github.com/Ceestou/MainPL/releases");
+                    getLogger().warning(">> Baixe em: https://www.spigotmc.org/resources/mainpl-%E2%AD%90-1-14-x-1-21-x-%E2%AD%90.128702/");
                     getLogger().warning(">> Entre em nosso Discord: https://discord.gg/HhkTKberpQ");
                     pendingUpdateMessage = "§c[MainPL] Há uma atualização disponível: §e"
                             + remoteVersionFinal + " §c(local: " + localVersion + ")\n"
                             + "\n§7 Entre em nosso Discord: §b§nhttps://discord.gg/HhkTKberpQ\n"
-                            + "\n§6 Link para Download: §e§nhttps://github.com/Ceestou/MainPL/releases/";
+                            + "\n§6 Link para Download: §e§nhttps://www.spigotmc.org/resources/mainpl-%E2%AD%90-1-14-x-1-21-x-%E2%AD%90.128702/";
 
                     // Avisar ops online
                     Bukkit.getScheduler().runTask(this, () -> {

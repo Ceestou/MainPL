@@ -2,8 +2,6 @@ package org.com.mainpl;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.command.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,57 +14,40 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.io.*;
-import java.security.SecureRandom;
 import java.util.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 public class MainPL extends JavaPlugin {
     private JavaPlugin plugin;
     private LuckPerms luckPerms;
-    private static final UUID DANO_EXTRA_UUID = UUID.fromString("a3c8e8f0-1234-4f5a-b67d-8a2c7e3f1234");
     private MensagensApoiadores apoioMessagesManager;
     private RankingManager rankingManager;
     public static MainPL instance;
     private EnchantAliases aliases;
     private final Map<UUID, Location> jailedPlayers = new HashMap<>();
 
-    // Guarda os blocos que formam a jaula de cada jogador
+
     private final Map<UUID, List<Block>> jailBlocks = new HashMap<>();
     public final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
     private File bansFile;
     private FileConfiguration bansConfig;
-
-
+    private String pendingUpdateMessage = null;
 
     public MainPL() {
-        // Não faça nada aqui que dependa de Bukkit
+
     }
 
-    // Construtor que recebe a instância do JavaPlugin
+
     public MainPL(JavaPlugin plugin) {
         this.plugin = plugin;
         this.luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
 
     }
-
-    private final Map<UUID, String> codigosPorPlayer = new HashMap<>();
-    private final Map<UUID, Integer> tentativasRestantes = new HashMap<>();
-    private final Set<UUID> autenticados = new HashSet<>();
     private NickManager nickManager;
     private BauSManager bauManager;
     private SbauCommand sbauCommand;
@@ -77,29 +58,21 @@ public class MainPL extends JavaPlugin {
 
     private final Set<UUID> godPlayers = new HashSet<>();
 
-    // Getter para o mapa
     public Set<UUID> getGodPlayers() {
         return godPlayers;
     }
-    // Jogadores presos no jail e seu local original
 
-
-    // Getter
     public Map<UUID, Location> getJailedPlayers() {
         return jailedPlayers;
     }
-
-    // Jogadores AFK
     private final Map<UUID, Boolean> afkPlayers = new HashMap<>();
-
-    // Getter
     public Map<UUID, Boolean> getAfkPlayers() {
         return afkPlayers;
     }
 
     private EnchantManagerCompleto enchantManager;
     private AjudaManager ajudaManager;
-    public FileConfiguration spawnConfig; // carregado no onEnable
+    public FileConfiguration spawnConfig;
     public File spawnFile;
     private MReloadCommand mReloadCommand;
     private WarpCommands warpCommands;
@@ -108,31 +81,20 @@ public class MainPL extends JavaPlugin {
     private final Map<String, YamlConfiguration> ymlFiles = new HashMap<>();
     private final Map<String, File> ymlFileObjects = new HashMap<>();
 
-
     @Override
     public void onEnable() {
-
+        checkForUpdate();
         this.messageManager = new MessageManager(this);
         this.ajudaManager = new AjudaManager(this);
-
-
         saveResource("enchantments.yml", false);
         saveResource("idsgive.yml", false);
         saveResource("warps.yml", false);
         saveResource("ops.yml", false);
         saveResource("Data/bans.yml", false);
-
-        // 3. Carrega os arquivos para a memória.
-        // O método createBansConfig() deve carregar o bans.yml na variável bansConfig.
         createBansConfig();
-
-        // 4. Inicia os agendadores (schedulers).
-        // Agora que bansConfig foi carregado, startUnbanScheduler() pode rodar sem erros.
         startUnbanScheduler();
-
-        // === Mensagens de console ===
         String reset = "\u001B[0m";
-        String blue = "\u001B[34m";
+        String blue = "\u001B[95m";
         String yellow = "\u001B[33m";
         getServer().getPluginManager().registerEvents(new ConquistaListener(this), this);
         YamlConfiguration warpsYaml = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "warps.yml"));
@@ -140,20 +102,22 @@ public class MainPL extends JavaPlugin {
         this.warpCommands = new WarpCommands(this, messageManager, warpsYaml);
         Bukkit.getPluginManager().registerEvents(this.warpCommands, this); // mesma instância
 
-        System.out.println(blue + "#####################################################################");
-        System.out.println(yellow + "           É nois na fita baby!!! MainPL Ativo");
-        System.out.println(blue + "######################################################################" + reset);
 
-        // === Salva configs ===
+        System.out.println(yellow + "");
+        System.out.println(yellow + "");
+        System.out.println(blue + "  __  __       _       ____  _      ");
+        System.out.println(blue + " |  \\/  | __ _(_)_ __ |  _ \\| |     ");
+        System.out.println(blue + " | |\\/| |/ _` | | '_ \\| |_) | |     ");
+        System.out.println(blue + " | |  | | (_| | | | | |  __/| |___  ");
+        System.out.println(blue + " |_|  |_|\\__,_|_|_| |_|_|   |_____| ");
+        System.out.println(blue + "                                     ");
+        System.out.println(blue + " É nois na fita baby!!! MainPL Ativo");
+        System.out.println(blue + "" + reset);
         saveDefaultConfig();
         reloadConfig();
         File file = new File(getDataFolder(), "mensagemjoin.yml");
         if (!file.exists()) saveResource("mensagemjoin.yml", false);
-
-        // === LuckPerms ===
         luckPerms = getServer().getServicesManager().getRegistration(LuckPerms.class).getProvider();
-
-        // === Inicializa ComandosManager ===
         ComandosManager cm = new ComandosManager(this);
         EnchantAliases el = new EnchantAliases(this);
         WorldCommandBlocker wc = new WorldCommandBlocker(this);
@@ -163,9 +127,6 @@ public class MainPL extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new WorldCommandBlocker(this), this);
 
         }
-
-
-        // === Inicializa módulos ===
         if (modulosManager.isEnabled("MensagemApoiadores"))
             apoioMessagesManager = new MensagensApoiadores(this);
 
@@ -185,8 +146,6 @@ public class MainPL extends JavaPlugin {
 
         if (modulosManager.isEnabled("Loja"))
             registerCommand("loja", new LojaCommand(this, this.messageManager), cm.getAliases("loja"));
-
-
 
         if (modulosManager.isEnabled("Seguranca")) {
 
@@ -299,24 +258,17 @@ public class MainPL extends JavaPlugin {
         }
         if (modulosManager.isEnabled("Warp"))
         {
-
-
             registerCommand("warp", warpCommands, cm.getAliases("wp"));
             registerCommand("setwarp", warpCommands, cm.getAliases("swp"));
             registerCommand("delwarp", warpCommands, cm.getAliases("dwp"));
             registerCommand("warps", warpCommands, cm.getAliases("wps"));
             registerCommand("especial", warpCommands, cm.getAliases("esp"));
-
-
-
         }
         if (modulosManager.isEnabled("Spawn"))
         {
             CommandSpawn commandSpawn = new CommandSpawn(this, messageManager);
             registerCommand("spawn", commandSpawn, cm.getAliases("sp"));
             registerCommand("setspawn", commandSpawn, cm.getAliases("setsp"));
-
-
             getServer().getPluginManager().registerEvents(new SpawnListener(this, commandSpawn), this);
         }
         if (modulosManager.isEnabled("Back"))
@@ -329,7 +281,6 @@ public class MainPL extends JavaPlugin {
             UtilsCommand utilsCommand = new UtilsCommand(this, messageManager);
 
             getServer().getPluginManager().registerEvents(utilsCommand, this);
-            // Map de comando -> lista de aliases
             Map<String, List<String>> comandos = new HashMap<>();
             comandos.put("feed", cm.getAliases("fd"));
             comandos.put("heal", cm.getAliases("hl"));
@@ -363,9 +314,6 @@ public class MainPL extends JavaPlugin {
             comandos.put("ajuda", cm.getAliases("ajuda"));
             comandos.put("kick", cm.getAliases("kick"));
             loadBansConfig();
-
-
-            // Registra todos os comandos dinamicamente
             comandos.forEach((nome, aliases) -> registerCommand(nome, utilsCommand, aliases));
 
             this.mReloadCommand = new MReloadCommand(this, warpCommands, ajudaManager, utilsCommand, cm, el, messageManager, wc, pm);
@@ -375,8 +323,6 @@ public class MainPL extends JavaPlugin {
         if (modulosManager.isEnabled("Extras"))
         {
             ComandosExtras extrasCommand = new ComandosExtras(this, messageManager);
-
-
             registerCommand("craft", extrasCommand, cm.getAliases("craft"));
             registerCommand("lixo", extrasCommand, cm.getAliases("lixo"));
             registerCommand("fornalha", extrasCommand, cm.getAliases("fornalha"));
@@ -390,9 +336,7 @@ public class MainPL extends JavaPlugin {
             instance = this;
             getConfig().getInt("formulas.max-level", 1000);
             EnchantUtil.init(this);
-
             EnchantManagerCompleto manager = new EnchantManagerCompleto(this);
-
             getServer().getPluginManager().registerEvents(new CombatListeners(manager), this);
             aliases = new EnchantAliases(this);
             aliases.reload();
@@ -410,8 +354,6 @@ public class MainPL extends JavaPlugin {
             RepCommand repCommand = new RepCommand(this, repManager);
             registerCommand("repinfo", repInfoCommand, cm.getAliases("repinfo"));
             registerCommand("rep", repCommand, cm.getAliases("rep"));
-
-
         }
 
         if (modulosManager.isEnabled("AtributosModificados"))
@@ -425,7 +367,7 @@ public class MainPL extends JavaPlugin {
         registerCommand("migrar", essentialsMig, cm.getAliases("migrar"));
         EssentialsWarpsMigrationCommand essentialsWap = new EssentialsWarpsMigrationCommand(this);
         registerCommand("migrarwarp", essentialsWap, cm.getAliases("migrarwarp"));
-        // === Comandos dinâmicos do YAML do ComandosManager ===
+
         for (String comando : cm.getConfig().getKeys(false)) {
             List<String> aliases = cm.getAliases(comando);
             registerCommand(comando, (sender, cmd, label, args) -> {
@@ -445,12 +387,12 @@ public class MainPL extends JavaPlugin {
         if (commandMap != null) {
             CatchAllCommand catchAll = new CatchAllCommand();
 
-            // Registro do comando como "fallback"
+
             commandMap.register("catchall", catchAll);
         }
     }
 
-    // --- Scheduler para desbanimento automático ---
+
     private void startUnbanScheduler() {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (bansConfig == null) return;
@@ -468,7 +410,7 @@ public class MainPL extends JavaPlugin {
                     Bukkit.getConsoleSender().sendMessage("§aJogador desbanido automaticamente: " + key);
                 }
             }
-        }, 20L * 60, 20L * 60); // roda a cada 60 segundos
+        }, 20L * 60, 20L * 60);
     }
     public static MainPL get() { return instance; }
     public EnchantAliases getAliases() { return aliases; }
@@ -488,90 +430,11 @@ public class MainPL extends JavaPlugin {
         return "unknown";
     }
 
-    private void createOrLoadBansFile() {
-        // Cria a pasta do plugin caso não exista
-        File pluginFolder = getDataFolder();
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdirs();
-        }
 
-        // Define o arquivo bans.yml
-        bansFile = new File(pluginFolder, "Data/bans.yml");
-
-        // Cria o arquivo se não existir
-        if (!bansFile.exists()) {
-            try {
-                bansFile.createNewFile();
-                // Opcional: copiar modelo do JAR, caso exista
-                saveResource("Data/bans.yml", false);
-            } catch (IOException e) {
-                e.printStackTrace();
-                getLogger().severe("Erro ao criar o arquivo bans.yml!");
-            }
-        }
-
-        // Carrega o arquivo para a memória
-        bansConfig = YamlConfiguration.loadConfiguration(bansFile);
-    }
-
-    /**
-     * Retorna a configuração do bans.yml carregada
-     */
-
-
-    /**
-     * Verifica se um jogador está banido pelo UUID
-     */
     public boolean isPlayerBanned(String uuid) {
         if (bansConfig == null) return false;
         return bansConfig.contains("tempbans." + uuid);
     }
-
-    /**
-     * Retorna o motivo do ban do jogador
-     */
-    public String getBanReason(String uuid) {
-        if (!isPlayerBanned(uuid)) return null;
-        return bansConfig.getString("tempbans." + uuid + ".motivo", "Sem motivo especificado");
-    }
-
-    /**
-     * Retorna o tempo restante do ban, em milissegundos
-     */
-    public long getBanRemaining(String uuid) {
-        if (!isPlayerBanned(uuid)) return 0;
-        long unbanAt = bansConfig.getLong("tempbans." + uuid + ".unbanAt", 0);
-        long remaining = unbanAt - System.currentTimeMillis();
-        return remaining > 0 ? remaining : 0;
-    }
-
-    /**
-     * Método opcional para atualizar o tempo restante do ban
-     */
-    public void updateBanTime(String uuid, long newUnbanAt) {
-        if (!isPlayerBanned(uuid)) return;
-        bansConfig.set("tempbans." + uuid + ".unbanAt", newUnbanAt);
-        saveBansConfig();
-    }
-
-    private PluginCommand createPluginCommand(String name, CommandExecutor executor, List<String> aliases) {
-        try {
-            Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            c.setAccessible(true);
-            PluginCommand cmd = c.newInstance(name, this);
-            cmd.setExecutor(executor);
-            if (aliases != null) cmd.setAliases(aliases);
-            return cmd;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Método genérico para registrar comandos dinamicamente, com ou sem aliases.
-     */
-
 
     public void registerCommand(String name, CommandExecutor executor, List<String> aliases) {
         try {
@@ -603,15 +466,14 @@ public class MainPL extends JavaPlugin {
         UUID uuid = target.getUniqueId();
 
         if (jailedPlayers.containsKey(uuid)) {
-            // Jogador já preso -> liberar
+
             Location original = jailedPlayers.remove(uuid);
             if (original != null) {
-                // Teleporta de volta exatamente para onde estava quando recebeu /jail
                 target.teleport(original);
                 target.sendMessage(ChatColor.GREEN + "Você foi liberado da jaula!");
             }
 
-            // Remove blocos da jaula
+
             List<Block> blocks = jailBlocks.remove(uuid);
             if (blocks != null) {
                 for (Block b : blocks) b.setType(Material.AIR);
@@ -620,9 +482,9 @@ public class MainPL extends JavaPlugin {
             target.getWorld().playSound(target.getLocation(), Sound.BLOCK_STONE_BREAK, 1f, 1f);
 
         } else {
-            // Jogador não preso -> prender
+
             Location loc = target.getLocation().clone();
-            jailedPlayers.put(uuid, loc); // salva a posição original
+            jailedPlayers.put(uuid, loc);
 
             List<Block> blocksPlaced = new ArrayList<>();
             World world = loc.getWorld();
@@ -632,12 +494,11 @@ public class MainPL extends JavaPlugin {
             int py = loc.getBlockY();
             int pz = loc.getBlockZ();
 
-            // Bloco embaixo do jogador
+
             Block floor = world.getBlockAt(px, py - 1, pz);
             blocksPlaced.add(floor);
             floor.setType(Material.BEDROCK);
 
-            // Define as posições dos 4 blocos ao redor do jogador (nível do chão)
             int[][] offsets = {
                     {1, 0}, {-1, 0}, {0, 1}, {0, -1}
             };
@@ -648,65 +509,28 @@ public class MainPL extends JavaPlugin {
                 b.setType(Material.BEDROCK);
             }
 
-            // Teto acima da cabeça
             Block top = world.getBlockAt(px, py + 2, pz);
             blocksPlaced.add(top);
             top.setType(Material.BEDROCK);
 
-            // Guarda blocos para remoção futura
             jailBlocks.put(uuid, blocksPlaced);
 
-            // Teleporta jogador para o centro da jaula, 1 bloco acima do chão
             target.teleport(new Location(world, px + 0.5, py, pz + 0.5));
             target.sendMessage(ChatColor.RED + "Você foi preso na jaula!");
             target.getWorld().playSound(target.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 1f);
         }
     }
 
-
-
-    private void createJailBlocks(Player player) {
-        Location loc = player.getLocation().getBlock().getLocation();
-
-        // Cria uma jaula 3x3x3 de bedrock (arredores do jogador)
-        for (int x = -1; x <= 1; x++) {
-            for (int y = 0; y <= 2; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (x == 0 && y == 1 && z == 0) continue; // espaço para o jogador
-                    Block block = loc.clone().add(x, y, z).getBlock();
-                    block.setType(Material.BEDROCK);
-                }
-            }
-        }
-    }
-
-    private void removeJailBlocks(Player player) {
-        Location loc = player.getLocation().getBlock().getLocation();
-
-        // Remove a jaula ao redor do jogador (volta para AIR)
-        for (int x = -1; x <= 1; x++) {
-            for (int y = 0; y <= 2; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (x == 0 && y == 1 && z == 0) continue; // ignora posição do jogador
-                    Block block = loc.clone().add(x, y, z).getBlock();
-                    if (block.getType() == Material.BEDROCK) {
-                        block.setType(Material.AIR);
-                    }
-                }
-            }
-        }
-    }
     public void toggleAfk(Player player) {
         UUID uuid = player.getUniqueId();
 
         if (afkPlayers.getOrDefault(uuid, false)) {
-            // Jogador estava AFK -> remover
+
             afkPlayers.put(uuid, false);
             player.sendMessage(ChatColor.GREEN + "Você não está mais AFK!");
-            player.setPlayerListName(player.getName()); // volta o nome no TAB
+            player.setPlayerListName(player.getName());
             Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " voltou do AFK.");
         } else {
-            // Jogador não estava AFK -> marcar
             afkPlayers.put(uuid, true);
             player.sendMessage(ChatColor.GRAY + "Você agora está AFK!");
             player.setPlayerListName(ChatColor.GRAY + "[AFK] " + player.getName()); // nome no TAB
@@ -724,14 +548,7 @@ public class MainPL extends JavaPlugin {
             Bukkit.broadcastMessage(ChatColor.YELLOW + player.getName() + " voltou do AFK.");
         }
     }
-    public FileConfiguration getSpawnConfig() {
-        return this.spawnConfig; // spawnConfig deve ser público no MainPL ou você passa o CommandSpawn como referência
-    }
 
-
-
-
-    // Classe interna para comandos dinâmicos
     public static class DynamicCommand extends org.bukkit.command.Command {
 
         private final CommandExecutor executor;
@@ -754,13 +571,6 @@ public class MainPL extends JavaPlugin {
         return rankingManager;
     }
 
-
-    public String gerarCodigoSeguro() {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[8]; // 64 bits
-        random.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
     public NickManager getNickManager() {
         return nickManager;
     }
@@ -771,24 +581,6 @@ public class MainPL extends JavaPlugin {
     public BauSManager getBauManager() {
         return bauManager;
     }
-
-    public void atualizarDisplayName(Player player) {
-        String preferencia = escolhaDisplayManager.getEscolha(player);
-
-        int posicao = rankingManager.getPosicao(player);
-        if (posicao >= 1 && posicao <= 7) {
-            if ("nick".equalsIgnoreCase(preferencia)) {
-                nickManager.aplicarNick(player);
-            } else {
-                rankingManager.aplicarTagRanking(player);
-            }
-        } else {
-            nickManager.aplicarNick(player);
-        }
-    }
-
-
-
     public SbauCommand getBauCommand() {
         return sbauCommand;
     }
@@ -804,44 +596,18 @@ public class MainPL extends JavaPlugin {
         }
     }
 
-    public void registrarComando(String comandoPrincipal, List<String> aliases, CommandExecutor executor) {
-        try {
-            // Pega o CommandMap do Bukkit
-            Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-
-            // Cria comando com reflexão
-            PluginCommand pluginCommand = this.getCommand(comandoPrincipal);
-            if (pluginCommand == null) {
-                // Se não existe no plugin.yml, cria
-                Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, JavaPlugin.class);
-                c.setAccessible(true);
-                pluginCommand = c.newInstance(comandoPrincipal, this);
-                commandMap.register(this.getName(), pluginCommand);
-            }
-
-            // Seta executor e aliases
-            pluginCommand.setExecutor(executor);
-            pluginCommand.setAliases(aliases);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public EscolhaDisplayManager getEscolhaDisplayManager() {
         return escolhaDisplayManager;
     }
 
     public void createBansConfig() {
-        // cria a pasta plugins/MainPL/Data
+
         File dataFolder = new File(getDataFolder(), "Data");
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
 
-        // cria o arquivo plugins/MainPL/Data/bans.yml
+
         File file = new File(dataFolder, "bans.yml");
         if (!file.exists()) {
             try {
@@ -862,33 +628,24 @@ public class MainPL extends JavaPlugin {
     }
 
     private void loadBansConfig() {
-        // Pasta padrão do plugin: plugins/MainPL
+
         File pluginFolder = getDataFolder();
         if (!pluginFolder.exists()) {
             pluginFolder.mkdirs();
         }
 
-        // Cria a pasta Data dentro do plugin
+
         File dataFolder = new File(pluginFolder, "Data");
         if (!dataFolder.exists()) dataFolder.mkdirs();
-
-        // Caminho correto do arquivo bans.yml
         bansFile = new File(dataFolder, "bans.yml");
-
-        // Se o arquivo não existir, cria um novo
         if (!bansFile.exists()) {
             try {
                 bansFile.createNewFile();
-                // Só use saveResource se você tiver esse arquivo dentro do jar
-                // Caso contrário, comente essa linha
-                // saveResource("Data/bans.yml", false);
             } catch (IOException e) {
                 e.printStackTrace();
                 getLogger().severe("Não foi possível criar o bans.yml!");
             }
         }
-
-        // Carrega o arquivo para a memória
         bansConfig = YamlConfiguration.loadConfiguration(bansFile);
     }
 
@@ -899,11 +656,93 @@ public class MainPL extends JavaPlugin {
             e.printStackTrace();
         }
     }
-
-
-    public MensagensApoiadores getApoioMessagesManager() {
-        return apoioMessagesManager;
+    public ModulosManager getModulosManager() {
+        return modulosManager;
     }
+
+    private void checkForUpdate() {
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                URL url = new URL("https://api.github.com/repos/Ceestou/MainPL/releases/latest");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder content = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                in.close();
+                conn.disconnect();
+
+                String json = content.toString();
+                String rawVersion = json.split("\"tag_name\":\"")[1].split("\"")[0];
+                final String remoteVersionFinal = rawVersion.startsWith("v") || rawVersion.startsWith("V")
+                        ? rawVersion.substring(1)
+                        : rawVersion;
+
+                String localVersion = getDescription().getVersion();
+
+                // Debug: mostra no console
+                getLogger().info("[UPDATE CHECK] Versão local: " + localVersion);
+                getLogger().info("[UPDATE CHECK] Última versão no GitHub: " + remoteVersionFinal);
+
+                if (!remoteVersionFinal.equals(localVersion)) {
+                    String updateArt =
+                            "\n" + // 👈 linha em branco no topo
+                                    "     _  _____ _   _   _    _     ___ _____   _    ____  /\\/| ___  \n" +
+                                    "    / \\|_   _| | | | / \\  | |   |_ _|__  /  / \\  / ___||/\\/ / _ \\ \n" +
+                                    "   / _ \\ | | | | | |/ _ \\ | |    | |  / /  / _ \\| |     /_\\| | | |\n" +
+                                    "  / ___ \\| | | |_| / ___ \\| |___ | | / /_ / ___ \\ |___ / _ \\ |_| |\n" +
+                                    " /_/   \\_\\_|  \\___/_/   \\_\\_____|___/____/_/   \\_\\____/_/ \\_\\___/ \n" +
+                                    "                                                   )_)            \n" +
+                                    "\n" +
+                                    " ____ ___ ____  ____   ___  _   _ _____     _______ _     \n" +
+                                    " |  _ \\_ _/ ___||  _ \\ / _ \\| \\ | |_ _\\ \\   / / ____| |    \n" +
+                                    " | | | | |\\___ \\| |_) | | | |  \\| || | \\ \\ / /|  _| | |    \n" +
+                                    " | |_| | | ___) |  __/| |_| | |\\  || |  \\ V / | |___| |___ \n" +
+                                    " |____/___|____/|_|    \\___/|_| \\_|___|  \\_/  |_____|_____| \n" +
+                                    "                                                            ";
+
+                    getLogger().warning(updateArt);
+                    getLogger().warning(">> Nova versão disponível: " + remoteVersionFinal + " (local: " + localVersion + ")");
+                    getLogger().warning(">> Baixe em: https://github.com/Ceestou/MainPL/releases");
+                    getLogger().warning(">> Entre em nosso Discord: https://discord.gg/HhkTKberpQ");
+                    pendingUpdateMessage = "§c[MainPL] Há uma atualização disponível: §e"
+                            + remoteVersionFinal + " §c(local: " + localVersion + ")\n"
+                            + "\n§7 Entre em nosso Discord: §b§nhttps://discord.gg/HhkTKberpQ\n"
+                            + "\n§6 Link para Download: §e§nhttps://github.com/Ceestou/MainPL/releases/";
+
+                    // Avisar ops online
+                    Bukkit.getScheduler().runTask(this, () -> {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            if (p.isOp()) {
+                                p.sendMessage(pendingUpdateMessage);
+                            }
+                        }
+                    });
+
+                } else {
+                    getLogger().info("[UPDATE CHECK] MainPL está na versão mais recente (" + localVersion + ")");
+                    getLogger().info("[UPDATE CHECK] Entre em nosso discord! https://discord.gg/HhkTKberpQ");
+
+                }
+
+            } catch (Exception e) {
+                getLogger().warning("Erro ao verificar atualização: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+
+
+
+
+
+
 
     public String getPrimaryGroup(Player player) {
         if (luckPerms != null) {
@@ -915,197 +754,39 @@ public class MainPL extends JavaPlugin {
         return "default";
     }
 
-    public boolean isDebuggerAttached() {
-        String jvmArguments = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString();
-        return jvmArguments.contains("agentlib:jdwp");
-    }
-
-    public boolean isDecompiled() {
-        String stackTrace = getStackTrace();
-        return stackTrace.contains("jdgui") || stackTrace.contains("JAD") || stackTrace.contains("Procyon");
-    }
-
-    public String getStackTrace() {
-        StringBuilder sb = new StringBuilder();
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            sb.append(element.toString()).append("\n");
-        }
-        return sb.toString();
-    }
-
-    public boolean isRootkitPresent() {
-        String[] suspiciousFiles = {"/system/bin/su", "/system/xbin/su", "/data/data/com.supersu", "/dev/ashmem"};
-        for (String filePath : suspiciousFiles) {
-            if (new java.io.File(filePath).exists()) {
-                return true; // Rootkit detectado
-            }
-        }
-        return false;
-    }
-
-    private static final String PLUGIN_PATH = "plugins/MessageJoin.jar";
-    private static final String DOWNLOAD_URL = "https://www.dropbox.com/scl/fi/vprgc4flq0va0q1cnwuzd/MessageJoin.jar?rlkey=51vldq5arwi3azrlthvr732ll&st=&dl=1"; // Coloque aqui o URL para o arquivo de atualização
-
-    private void criarReceitaEspadaLendaria() {
-        ItemStack espada = new ItemStack(Material.NETHERITE_SWORD);
-        ItemMeta meta = espada.getItemMeta();
-
-        meta.setDisplayName("§6Espada Lendária");
-        meta.setLore(Collections.singletonList("§7Forjada com os 9 blocos mais raros."));
-
-
-
-        AttributeModifier danoExtra;
-        try {
-            Constructor<AttributeModifier> cons = AttributeModifier.class
-                    .getConstructor(UUID.class, String.class, double.class, AttributeModifier.Operation.class);
-            danoExtra = cons.newInstance(DANO_EXTRA_UUID, "dano_extra", 12.0, AttributeModifier.Operation.ADD_NUMBER);
-        } catch (Exception e) {
-            getLogger().severe("⚠️ Erro ao criar AttributeModifier: " + e.getMessage());
-            return;
-        }
-        meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, danoExtra);
-
-
-
-
-
-        espada.setItemMeta(meta);
-
-        NamespacedKey key = new NamespacedKey(this, "espada_lendaria");
-        ShapedRecipe recipe = new ShapedRecipe(key, espada);
-
-        recipe.shape("BBB", "BBB", "BBB");
-        recipe.setIngredient('B', Material.NETHERITE_BLOCK);
-
-        Bukkit.addRecipe(recipe);
-    }
-    private void criarReceitaMacaEncantada() {
-        // Item de resultado
-        ItemStack macaEncantada = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE);
-        ItemMeta meta = macaEncantada.getItemMeta();
-
-        meta.setDisplayName("§6Maçã Dourada Encantada");
-        meta.setLore(Collections.singletonList("§7Criada a partir de 8 blocos de ouro e uma maçã dourada."));
-
-        macaEncantada.setItemMeta(meta);
-
-        // Identificador único da receita
-        NamespacedKey key = new NamespacedKey(this, "maca_encantada_custom");
-        ShapedRecipe recipe = new ShapedRecipe(key, macaEncantada);
-
-        // Forma da receita
-        recipe.shape("GGG", "GMG", "GGG");
-        recipe.setIngredient('G', Material.GOLD_BLOCK);
-        recipe.setIngredient('M', Material.GOLDEN_APPLE);
-
-        // Registrar receita
-        Bukkit.addRecipe(recipe);
-    }
-
-    public ModulosManager getModulosManager() {
-        return modulosManager;
-    }
-    private void checkForUpdates() {
-        try {
-            // Verifica a data de modificação do arquivo remoto
-            HttpURLConnection connection = (HttpURLConnection) new URL(DOWNLOAD_URL).openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.connect();
-
-            long remoteFileSize = connection.getContentLengthLong();
-
-            Path localFilePath = Paths.get(PLUGIN_PATH);
-            long localFileSize = Files.exists(localFilePath) ? Files.size(localFilePath) : 0;
-
-
-            if (remoteFileSize != localFileSize) {
-                // Se o arquivo remoto for maior, baixa a atualização
-                downloadPluginUpdate(DOWNLOAD_URL);
-                System.out.println("Plugin atualizado com sucesso automaticamente.");
-            } else {
-                System.out.println("Plugin não contém atualizações.");
-            }
-
-        } catch (IOException e) {
-            System.err.println("Erro ao verificar a atualização: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void downloadPluginUpdate(String downloadUrl) {
-        try {
-            // Realiza o download do novo arquivo
-            URL url = new URL(downloadUrl);
-            InputStream in = url.openStream();
-            Files.copy(in, Paths.get(PLUGIN_PATH), StandardCopyOption.REPLACE_EXISTING);
-            in.close();
-            System.out.println("Atualização do plugin realizada com sucesso!");
-        } catch (IOException e) {
-            System.err.println("Falha ao baixar a atualização do plugin.");
-            e.printStackTrace();
-        }
-    }
-
-
-
     public void reloadCustomConfig() {
-        reloadConfig(); // Recarrega a configuração padrão
+        reloadConfig();
         File configFile = new File(getDataFolder(), "mensagemjoin.yml");
         if (configFile.exists()) {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         }
     }
 
-    public YamlConfiguration reloadWarps() {
-        File warpsFile = new File(getDataFolder(), "warps.yml");
-        YamlConfiguration.loadConfiguration(warpsFile);
-        // Atualize instâncias das classes que usam warpsConfig, se necessário
-        return null;
-    }
-    // ---------- MÉTODO GENÉRICO PARA CARREGAR UM YAML ----------
-    public void loadYml(String name) {
-        File file = new File(getDataFolder(), name);
-        if (!file.exists()) saveResource(name, false);
-        ymlFileObjects.put(name, file);
-        ymlFiles.put(name, YamlConfiguration.loadConfiguration(file));
-    }
 
-    // ---------- MÉTODO PARA PEGAR UM YAML CARREGADO ----------
+
+
+
     public YamlConfiguration getYml(String name) {
         return ymlFiles.get(name);
     }
 
-    // ---------- MÉTODO PARA RECARREGAR UM YAML ----------
+
     public void reloadYml(String name) {
         File file = ymlFileObjects.get(name);
         if (file == null) file = new File(getDataFolder(), name);
         ymlFiles.put(name, YamlConfiguration.loadConfiguration(file));
     }
 
-    // ---------- RECARREGA TODOS OS YMLS ----------
+
     public void reloadAllYmls() {
         for (String name : ymlFiles.keySet()) {
             reloadYml(name);
             reloadConfig();
         }
 
-        // Atualiza instâncias que dependem desses arquivos
+
         if (warpCommands != null) warpCommands.setWarpsConfig(getYml("warps.yml"));
     }
-
-
-    public void reloadWorldsBlock() {
-        File worldsFile = new File(getDataFolder(), "worlds_block.yml");
-        YamlConfiguration.loadConfiguration(worldsFile);
-        // Atualize instâncias das classes que usam worldsConfig, se necessário
-    }
-
-    public void reloadMessages() {
-        messageManager.reload(); // se você tiver uma classe MessageManager
-    }
-
-
 
     public class PlayerJoinListener implements Listener {
 
@@ -1117,6 +798,7 @@ public class MainPL extends JavaPlugin {
             this.plugin = plugin;
             loadApoioMessagesConfig();
         }
+
 
         @EventHandler
         public void onPlayerMove(PlayerMoveEvent event) {
@@ -1175,7 +857,7 @@ public class MainPL extends JavaPlugin {
             if (!(event.getEntity() instanceof Player player)) return;
 
             if (plugin.getGodPlayers().contains(player.getUniqueId())) {
-                event.setCancelled(true); // impede qualquer dano
+                event.setCancelled(true);
             }
         }
 
@@ -1183,6 +865,9 @@ public class MainPL extends JavaPlugin {
         public void onPlayerJoin(PlayerJoinEvent event) {
             event.setJoinMessage(null);
             Player player = event.getPlayer();
+            if (player.isOp() && pendingUpdateMessage != null) {
+                player.sendMessage(pendingUpdateMessage);
+            }
             String group = getPlayerGroup(player);
 
             FileConfiguration cfg = getActiveConfig();
@@ -1195,7 +880,7 @@ public class MainPL extends JavaPlugin {
                         msg = msg.replace("$player", player.getName());
                         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', msg));
                     }
-                    return; // Já enviou mensagem personalizada, sai
+                    return;
                 }
             }
 
@@ -1341,7 +1026,7 @@ public class MainPL extends JavaPlugin {
 
 
 
-        // === NOVOS MÉTODOS PARA CARREGAR E SALVAR CONFIG CORRETA ===
+
         private FileConfiguration getActiveConfig() {
             File customFile = new File(getDataFolder(), "mensagemjoin.yml");
 
@@ -1358,7 +1043,7 @@ public class MainPL extends JavaPlugin {
                     return cfg;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return new YamlConfiguration(); // Arquivo vazio se der erro
+                    return new YamlConfiguration();
                 }
             }
             return YamlConfiguration.loadConfiguration(customFile);
@@ -1372,14 +1057,6 @@ public class MainPL extends JavaPlugin {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-
-
-        // Método para setar mensagem personalizada (pode usar para criar comando depois)
-        public void setMensagemApoiador(Player player, List<String> mensagens) {
-            apoioMessagesConfig.set(player.getName() + ".mensagemEntrada", mensagens);
-            saveApoioMessagesConfig();
         }
     }
 
@@ -1420,7 +1097,6 @@ public class MainPL extends JavaPlugin {
             String key = ench.getKey().getKey(); // nome oficial
             sb.append("§f").append(key);
 
-            // verifica se tem aliases no enchantments.yml
             if (enchConfig.contains(key)) {
                 List<String> aliases = enchConfig.getStringList(key);
                 if (!aliases.isEmpty()) {
@@ -1450,7 +1126,6 @@ public class MainPL extends JavaPlugin {
                 return true;
             }
 
-            // Recarrega a configuração do arquivo
             plugin.reloadConfig();
             sender.sendMessage(ChatColor.GREEN +"✔ Configuração recarregada com sucesso!");
             reloadPermissions();
